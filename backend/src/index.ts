@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express'
 import {
+  PlayersData,
+  PlayersSeasonData,
   StandingsData,
   TeamsData,
 } from './types'
@@ -63,6 +65,55 @@ app.get('/teams', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal Server Error' })
   }
 })
+app.get('/players', async (req: Request, res: Response) => {
+  const season = new Date().getFullYear()
+  const playersUrl = `${NBA_STATS_API_URL}/scores/json/PlayersActiveBasic`
+  const playerSeasonUrl = `${NBA_STATS_API_URL}/stats/json/PlayerSeasonStats/${season}`
+
+  try {
+    const [playersResponse, playerSeasonResponse] = await Promise.all([
+      fetch(playersUrl, {
+        headers: {
+          'Ocp-Apim-Subscription-Key': `${NBA_STATS_API_KEY}`,
+        },
+      }),
+      fetch(playerSeasonUrl, {
+        headers: {
+          'Ocp-Apim-Subscription-Key': `${NBA_STATS_API_KEY}`,
+        },
+      }),
+    ])
+
+    if (!playersResponse.ok) {
+      throw new Error(
+        `Players API request failed: ${playersResponse.statusText}`
+      )
+    }
+    if (!playerSeasonResponse.ok) {
+      throw new Error(
+        `Player Stats API request failed: ${playerSeasonResponse.statusText}`
+      )
+    }
+
+    const playersData = await playersResponse.json()
+    const playersSeasonData = await playerSeasonResponse.json()
+
+    const joinedData = playersData.map((player: PlayersData) => {
+      const playerStats = playersSeasonData.find(
+        (season: PlayersSeasonData) => season.PlayerID === player.PlayerID
+      )
+      return {
+        ...player,
+        ...playerStats,
+      }
+    })
+
+    console.log(joinedData)
+    res.json(joinedData)
+  } catch (error) {
+    console.error('Error fetching data:', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
 })
 
 app.listen(PORT, () => {
