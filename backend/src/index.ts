@@ -116,6 +116,19 @@ app.get('/players', async (req: Request, res: Response) => {
   }
 })
 
+app.get('/games', async (req: Request, res: Response) => {
+  const season = new Date().getFullYear()
+  const schedulesUrl = `${NBA_STATS_API_URL}/scores/json/SchedulesBasic/${season}`
+
+  const response = await fetch(schedulesUrl, {
+    headers: {
+      'Ocp-Apim-Subscription-Key': `${NBA_STATS_API_KEY}`,
+    },
+  })
+  const data = await response.json()
+
+  res.send(data)
+})
 app.listen(PORT, () => {
   console.log('Server is running on', PORT)
 })
