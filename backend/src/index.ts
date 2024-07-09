@@ -129,6 +129,16 @@ app.get('/games', async (req: Request, res: Response) => {
 
   res.send(data)
 })
+app.get('/news', async (req: Request, res: Response) => {
+  const response = await fetch(`${NBA_NEWS_API_URL}`, {
+    headers: {
+      Authorization: `${NBA_NEWS_API_KEY}`,
+    },
+  })
+  const data = await response.json()
+
+  res.send(data.articles.slice(0, 21))
+})
 app.listen(PORT, () => {
   console.log('Server is running on', PORT)
 })
