@@ -1,12 +1,9 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { useRootNavigationState, Redirect } from 'expo-router'
 
-const Home = () => {
-  return (
-    <View>
-      <Text>Home</Text>
-    </View>
-  )
+export default function InitalRouting() {
+  const rootNavigationState = useRootNavigationState()
+
+  if (!rootNavigationState?.key) return null
+
+  return <Redirect href={'/(tabs)/news'} />
 }
-
-export default Home
