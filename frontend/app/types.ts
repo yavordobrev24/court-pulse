@@ -136,3 +136,16 @@ export type Player = {
   LineupConfirmed: string | null
   LineupStatus: string
 }
+
+export type NewsArticle = {
+  source: {
+    name: string
+  }
+  author: string
+  title: string
+  description: string
+  url: string
+  urlToImage: string
+  publishedAt: string
+  content: string
+}
